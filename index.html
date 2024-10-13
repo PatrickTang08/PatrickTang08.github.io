@@ -33,13 +33,12 @@
 <body>
     <div>
         <h1 id="greeting">Hello, World!</h1>
-        <button onclick="changeGreeting()">Change Greeting</button>
+        <button onclick="goToLevel1()">Start Here</button>
     </div>
 
     <script>
         function changeGreeting() {
-            const greeting = document.getElementById("greeting");
-            greeting.textContent = "Hello, Universe!";
+            window.location.href="level1.html";
         }
     </script>
 </body>
