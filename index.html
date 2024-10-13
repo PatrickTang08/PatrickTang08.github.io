@@ -36,6 +36,11 @@
         <button onclick="changeGreeting()">Change Greeting</button>
     </div>
 
-    <script src="hello.js"></script>
+    <script>
+        function changeGreeting() {
+            const greeting = document.getElementById("greeting");
+            greeting.textContent = "Hello, Universe!";
+        }
+    </script>
 </body>
 </html>
