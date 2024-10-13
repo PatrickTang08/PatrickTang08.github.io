@@ -17,9 +17,25 @@
         h1 {
             color: #333;
         }
+        button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
     </style>
 </head>
 <body>
-    <h1>Hello, World!</h1>
+    <div>
+        <h1 id="greeting">Hello, World!</h1>
+        <button onclick="changeGreeting()">Change Greeting</button>
+    </div>
+
+    <script src="hello.js"></script>
 </body>
 </html>
