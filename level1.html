@@ -74,7 +74,7 @@
             <input type="text" id="attempt" name="attempt" placeholder="Type your answer...">
             <input type="submit" value="Submit">
         </form>
-        <p>Let's test your puzzle and reading skills. This one will be a simple one. Type "I've read everything on the screen and understand how to proceed."</p>
+        <p>Let's test your puzzle and reading skills. This one will be a simple one. Type "I've read everything on the screen."</p>
         <p class="hidden-text-bg">Ha caught me.</p>
 
     </div>
@@ -87,9 +87,9 @@
         function checkAnswer(event) {
             event.preventDefault();
             const userInput = document.getElementById('attempt').value;
-            const correctAnswer = 'I've read everything on the screen and understand how to proceed.'; // Replace with your predetermined answer
+            const correctAnswer = 'I've read everything on the screen.';
 
-            if (userInput.toLowerCase() === correct answer.toLowerCase()) {
+            if (userInput.toLowerCase() === correctAnswer.toLowerCase()) {
                 window.location.href = 'index.html';
             } else {
                 alert('Wrong answer. Please try again.');
