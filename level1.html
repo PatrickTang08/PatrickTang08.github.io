@@ -60,6 +60,7 @@
     </style>
 </head>
 <body>
+    <p>Let's test your puzzle and reading skills. This one will be a simple one. Type "I've read everything on this screen and understand what to do."</p>
     <div class="container">
         <h1>Level 1</h1>
         <button onclick="backToHome()">Back to Home</button>
@@ -79,7 +80,7 @@
         function checkAnswer(event) {
             event.preventDefault();
             const userInput = document.getElementById('attempt').value;
-            const correctAnswer = 'correct answer'; // Replace with your predetermined answer
+            const correctAnswer = 'I've read everything on this screen and understand what to do.'; // Replace with your predetermined answer
 
             if (userInput.toLowerCase() === correctAnswer.toLowerCase()) {
                 window.location.href = 'index.html';
