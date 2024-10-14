@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Search Bar Example</title>
+    <script>
+        function checkAnswer(event) {
+            event.preventDefault(); // Prevent form submission
+            const userInput = document.getElementById('searchInput').value;
+            const correctAnswer = 'correct answer'; // Replace with your predetermined answer
+
+            if (userInput.toLowerCase() === correctAnswer.toLowerCase()) {
+                window.location.href = 'https://puzzlesitecom.wordpress.com/level-2/';
+            } else {
+                alert('Wrong answer. Please try again.');
+            }
+        }
+    </script>
+</head>
+<body>
+    <form onsubmit="checkAnswer(event)">
+        <label for="searchInput">Search:</label>
+        <input type="text" id="searchInput" name="searchInput" placeholder="Type your answer...">
+        <input type="submit" value="Submit">
+    </form>
+</body>
+</html>
