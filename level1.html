@@ -36,8 +36,8 @@
         <button onclick="backToHome()">back to home</button>
     </div>
     <form onsubmit="checkAnswer(event)">
-        <label for="searchInput">Search:</label>
-        <input type="text" id="searchInput" name="searchInput" placeholder="Type your answer...">
+        <label for="searchInput">Answer:</label>
+        <input type="text" id="attempt" name="attempt" placeholder="Type your answer...">
         <input type="submit" value="Submit">
     </form>
     <script>
@@ -45,8 +45,8 @@
             window.location.href = "index.html";
         }
         function checkAnswer(event) {
-            event.preventDefault(); // Prevent form submission
-            const userInput = document.getElementById('searchInput').value;
+            event.preventDefault();
+            const userInput = document.getElementById('attempt').value;
             const correctAnswer = 'correct answer'; // Replace with your predetermined answer
 
             if (userInput.toLowerCase() === correctAnswer.toLowerCase()) {
