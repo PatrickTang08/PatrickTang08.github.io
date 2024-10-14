@@ -14,9 +14,15 @@
             margin: 0;
             background-color: #f0f0f0;
         }
+
+        .container {
+            text-align: center;
+        }
+
         h1 {
             color: #333;
         }
+
         button {
             margin-top: 20px;
             padding: 10px 20px;
@@ -25,25 +31,51 @@
             border: none;
             cursor: pointer;
         }
+
         button:hover {
             background-color: #0056b3;
+        }
+
+        form {
+            margin-top: 20px;
+        }
+
+        input[type="text"] {
+            padding: 8px;
+            width: 200px;
+            margin-bottom: 10px;
+        }
+
+        input[type="submit"] {
+            padding: 10px 20px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        input[type="submit"]:hover {
+            background-color: #218838;
         }
     </style>
 </head>
 <body>
-    <div>
+    <div class="container">
         <h1>Level 1</h1>
-        <button onclick="backToHome()">back to home</button>
+        <button onclick="backToHome()">Back to Home</button>
+
+        <form onsubmit="checkAnswer(event)">
+            <label for="attempt">Answer:</label>
+            <input type="text" id="attempt" name="attempt" placeholder="Type your answer...">
+            <input type="submit" value="Submit">
+        </form>
     </div>
-    <form onsubmit="checkAnswer(event)">
-        <label for="searchInput">Answer:</label>
-        <input type="text" id="attempt" name="attempt" placeholder="Type your answer...">
-        <input type="submit" value="Submit">
-    </form>
+
     <script>
         function backToHome() {
             window.location.href = "index.html";
         }
+
         function checkAnswer(event) {
             event.preventDefault();
             const userInput = document.getElementById('attempt').value;
