@@ -68,7 +68,7 @@
     <div class="container">
         <h1>Level 1</h1>
         <button onclick="backToHome()">Back to Home</button>
-        <p>Let's test your trust and reading skills. This one will be a simple one. Type "I read everything on the screen."</p>
+        <p> This one will be a simple one. Type "I hope I didn't miss anything."</p>
         <p class="hidden-text-bg">Nice find. Quick note: you should record all of the first numbers in your answers starting from the next level. If there are none, put in 0. Thank me later.</p>
         <form onsubmit="checkAnswer(event)">
             <label for="attempt">Answer:</label>
@@ -86,7 +86,7 @@
         function checkAnswer(event) {
             event.preventDefault();
             const userInput = document.getElementById('attempt').value;
-            const correctAnswer = 'I read everything on the screen.';
+            const correctAnswer = "I hope I didn't miss anything.";
 
             if (userInput.toLowerCase() === correctAnswer.toLowerCase()) {
                 window.location.href = 'index.html';
