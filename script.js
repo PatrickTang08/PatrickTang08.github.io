@@ -9,7 +9,6 @@ const discardButton = document.getElementById('discardButton');
 const playHandButton = document.getElementById('playHandButton');
 const resetButton = document.getElementById('resetButton');
 
-
 let deck = [];
 let playerHand = [];
 let discardPile = [];
@@ -17,6 +16,7 @@ let selectedCard = null;
 let score = 0;
 let discardsLeft = 2;
 let level = 1;
+const MAX_HAND_SIZE = 8; // Limit of cards in the hand
 
 // Card values and suits (You can add more sophisticated card types)
 const suits = ["H", "D", "C", "S"];
@@ -30,7 +30,7 @@ function createDeck() {
             deck.push({ suit, value });
         }
     }
-    shuffleDeck(deck)
+    shuffleDeck(deck);
 }
 
 // Fisher-Yates shuffle algorithm to randomize the deck
@@ -43,21 +43,26 @@ function shuffleDeck(deck) {
 
 // Function to draw card
 function drawCard() {
-  if (deck.length === 0) {
-    alert("Out of cards!");
-    return;
-  }
-  const card = deck.pop();
-  playerHand.push(card);
-  renderPlayerHand();
+    if (playerHand.length >= MAX_HAND_SIZE) {
+        alert("Hand is full!");
+        return;
+    }
+
+    if (deck.length === 0) {
+        alert("Out of cards!");
+        return;
+    }
+    const card = deck.pop();
+    playerHand.push(card);
+    renderPlayerHand();
 }
 
 // Function to discard card
 function discardCard() {
-  if (selectedCard === null){
-    alert("Select a card to discard")
-    return;
-  }
+    if (selectedCard === null) {
+        alert("Select a card to discard")
+        return;
+    }
     discardPile.push(selectedCard);
     playerHand = playerHand.filter(card => card !== selectedCard);
     selectedCard = null;
@@ -73,39 +78,37 @@ function calculateHandValue() {
     let handValue = 0
     let numPairs = 0;
 
-     // Create a mapping to count the occurrences of each value in the hand
-     const valueCounts = {};
-     playerHand.forEach(card => {
-       if (valueCounts[card.value]) {
-         valueCounts[card.value]++;
-       } else {
-         valueCounts[card.value] = 1;
-       }
-     });
+    // Create a mapping to count the occurrences of each value in the hand
+    const valueCounts = {};
+    playerHand.forEach(card => {
+        if (valueCounts[card.value]) {
+            valueCounts[card.value]++;
+        } else {
+            valueCounts[card.value] = 1;
+        }
+    });
 
-     // Check for pairs
-    for (const value in valueCounts){
-      if(valueCounts[value] >= 2)
-      {
-        numPairs++;
-      }
+    // Check for pairs
+    for (const value in valueCounts) {
+        if (valueCounts[value] >= 2) {
+            numPairs++;
+        }
     }
 
-    if(numPairs >= 1){
-      handValue = 10 * (numPairs* level);
-      if (numPairs >=2)
-      {
-        handValue += 10 * (numPairs * level)
-      }
+    if (numPairs >= 1) {
+        handValue = 10 * (numPairs * level);
+        if (numPairs >= 2) {
+            handValue += 10 * (numPairs * level)
+        }
     }
 
-    
+
     return handValue;
 }
 
 // Function to play the hand
 function playHand() {
-  const handValue = calculateHandValue();
+    const handValue = calculateHandValue();
     score += handValue;
     level++;
     playerHand = [];
@@ -130,8 +133,7 @@ function renderPlayerHand() {
         cardDiv.addEventListener('click', () => selectCard(card, cardDiv));
         playerHandDiv.appendChild(cardDiv);
     });
-    if (playerHand.length > 0)
-    {
+    if (playerHand.length > 0) {
         playHandButton.disabled = false;
     }
     else {
@@ -141,7 +143,7 @@ function renderPlayerHand() {
 
 // Function to render the discard pile
 function renderDiscardPile() {
-  discardPileDiv.innerHTML = '<p>Discard Pile</p>';
+    discardPileDiv.innerHTML = '<p>Discard Pile</p>';
     discardPile.forEach(card => {
         const cardDiv = document.createElement('div');
         cardDiv.textContent = `${card.value}${card.suit}`;
@@ -154,11 +156,11 @@ function renderDiscardPile() {
 function selectCard(card, cardDiv) {
     if (selectedCard) {
         const selectedDiv = document.querySelector('.card.selected');
-        if(selectedDiv){
-           selectedDiv.classList.remove('selected');
+        if (selectedDiv) {
+            selectedDiv.classList.remove('selected');
         }
     }
-    
+
     selectedCard = card;
     cardDiv.classList.add('selected')
     selectedCardDiv.innerHTML = `<p>Selected Card ${card.value}${card.suit}</p>`
@@ -169,17 +171,23 @@ function selectCard(card, cardDiv) {
 
 // Function to reset the game
 function resetGame() {
-  createDeck();
-  playerHand = [];
-  discardPile = [];
-  selectedCard = null;
-  score = 0;
-  discardsLeft = 2;
-  level = 1;
-  renderPlayerHand();
-  renderDiscardPile();
-  updateGameInfo();
-  selectedCardDiv.innerHTML = `<p>Selected Card</p>`
+    createDeck();
+    playerHand = [];
+    discardPile = [];
+    selectedCard = null;
+    score = 0;
+    discardsLeft = 2;
+    level = 1;
+    // Automatically draw 8 cards at the start
+    for (let i = 0; i < MAX_HAND_SIZE; i++) {
+        if (deck.length > 0) {
+            drawCard();
+        }
+    }
+    renderPlayerHand();
+    renderDiscardPile();
+    updateGameInfo();
+    selectedCardDiv.innerHTML = `<p>Selected Card</p>`
 }
 
 // Function to update game information
@@ -194,6 +202,7 @@ drawButton.addEventListener('click', drawCard);
 discardButton.addEventListener('click', discardCard);
 playHandButton.addEventListener('click', playHand);
 resetButton.addEventListener('click', resetGame);
+
 
 // Start the game!
 resetGame()
