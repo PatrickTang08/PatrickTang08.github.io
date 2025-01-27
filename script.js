@@ -1,3 +1,6 @@
+const startScreen = document.getElementById('startScreen');
+const gameContainer = document.getElementById('gameContainer');
+const startButton = document.getElementById('startButton');
 const playerHandDiv = document.getElementById('playerHand');
 const discardPileDiv = document.getElementById('discardPile');
 const selectedCardDiv = document.getElementById('selectedCard');
@@ -8,6 +11,7 @@ const drawButton = document.getElementById('drawButton');
 const discardButton = document.getElementById('discardButton');
 const playHandButton = document.getElementById('playHandButton');
 const resetButton = document.getElementById('resetButton');
+
 
 let deck = [];
 let playerHand = [];
@@ -70,6 +74,8 @@ function discardCard() {
     playerHand = playerHand.filter(card => !selectedCards.includes(card));
     selectedCards = [];
     discardsLeft--;
+    
+    refillHand();
 
     renderPlayerHand();
     renderDiscardPile();
@@ -77,13 +83,22 @@ function discardCard() {
     selectedCardDiv.innerHTML = `<p>Selected Card</p>`
 }
 
+// Function to refill the hand to 8 cards
+function refillHand() {
+    while (playerHand.length < MAX_HAND_SIZE && deck.length > 0) {
+        drawCard();
+    }
+}
+
+
 // Function to calculate hand value
 function calculateHandValue() {
   let handValue = 0;
-  let numPairs = 0;
-
-  // Create a mapping to count the occurrences of each value in the selected cards
+    let pairs = 0
+    let threeOfAKinds = 0;
+    let fourOfAKinds = 0;
   const valueCounts = {};
+    
   selectedCards.forEach((card) => {
       if (valueCounts[card.value]) {
           valueCounts[card.value]++;
@@ -92,21 +107,27 @@ function calculateHandValue() {
       }
   });
 
-  // Check for pairs
-  for (const value in valueCounts) {
-      if (valueCounts[value] >= 2) {
-          numPairs++;
-      }
+     for (const value in valueCounts) {
+    if (valueCounts[value] === 2) {
+      pairs++;
+    } else if (valueCounts[value] === 3) {
+      threeOfAKinds++;
+    } else if (valueCounts[value] === 4) {
+      fourOfAKinds++;
+    }
   }
-  
-  if (numPairs >= 1) {
-    handValue = 10 * (numPairs * level);
-      if (numPairs >= 2) {
-          handValue += 10 * (numPairs * level)
-      }
-  }
-
-    return handValue;
+    
+    if (fourOfAKinds > 0) {
+      handValue = 100 * fourOfAKinds * level
+    }
+    else if (threeOfAKinds > 0) {
+      handValue = 50 * threeOfAKinds * level
+    }
+    else if(pairs > 0){
+      handValue = 10 * pairs * level
+    }
+    
+  return handValue;
 }
 
 
@@ -127,6 +148,7 @@ function playHand() {
     shuffleDeck(deck);
     discardPile = [];
     selectedCards = [];
+      refillHand();
 
     renderPlayerHand();
     renderDiscardPile();
@@ -204,12 +226,8 @@ function resetGame() {
     discardsLeft = 2;
     level = 1;
     // Automatically draw 8 cards at the start
-    for (let i = 0; i < MAX_HAND_SIZE; i++) {
-        if (deck.length > 0) {
-            drawCard();
-        }
-    }
-    renderPlayerHand();
+      refillHand();
+      renderPlayerHand();
     renderDiscardPile();
     updateGameInfo();
     selectedCardDiv.innerHTML = `<p>Selected Card</p>`
@@ -228,6 +246,11 @@ discardButton.addEventListener('click', discardCard);
 playHandButton.addEventListener('click', playHand);
 resetButton.addEventListener('click', resetGame);
 
-
-// Start the game!
-resetGame()
+// Start button Event Listener
+startButton.addEventListener('click', () => {
+    startScreen.classList.add('hidden');
+    gameContainer.classList.remove('hidden');
+    resetGame(); // Initialize the game when the start button is clicked
+})
+// Initially hide the game container and show the start screen
+gameContainer.classList.add('hidden');
