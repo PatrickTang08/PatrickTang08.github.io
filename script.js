@@ -23,7 +23,6 @@ let level = 1;
 const MAX_HAND_SIZE = 8;
 const MAX_SELECT_SIZE = 5; // Max cards that can be selected
 
-// Card values and suits (You can add more sophisticated card types)
 const suits = ["H", "D", "C", "S"];
 const values = ["2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K", "A"];
 
@@ -38,7 +37,7 @@ function createDeck() {
     shuffleDeck(deck);
 }
 
-// Fisher-Yates shuffle algorithm to randomize the deck
+// shuffle algorithm to randomize the deck
 function shuffleDeck(deck) {
     for (let i = deck.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
