@@ -3,43 +3,35 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Puzzle Website</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-            background-color: #f0f0f0;
-        }
-        h1 {
-            color: #333;
-        }
-        button {
-            margin-top: 20px;
-            padding: 10px 20px;
-            background-color: #007BFF;
-            color: white;
-            border: none;
-            cursor: pointer;
-        }
-        button:hover {
-            background-color: #0056b3;
-        }
-    </style>
+    <title>Balatro Simulator</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <div>
-        <h1>Welcome!</h1>
-        <button onclick="goToLevel1()">Start here</button>
+    <div class="game-container">
+        <h1>Balatro Simulator</h1>
+        <div class="player-hand" id="playerHand">
+             <!-- Cards will be dynamically added here -->
+        </div>
+        <div class="discard-pile" id="discardPile">
+            <p>Discard Pile</p>
+            <!-- Cards will be dynamically added here -->
+        </div>
+         <div class="selected-card" id="selectedCard">
+             <p>Selected Card</p>
+        </div>
+        <div class="game-info">
+            <p>Score: <span id="score">0</span></p>
+            <p>Discards Left: <span id="discardsLeft">2</span></p>
+            <p>Level: <span id="level">1</span></p>
+        </div>
+        <div class="controls">
+            <button id="drawButton">Draw Card</button>
+            <button id="discardButton" disabled>Discard Selected</button>
+            <button id="playHandButton" disabled>Play Hand</button>
+            <button id="resetButton">Reset Game</button>
+         </div>
     </div>
 
-    <script>
-        function goToLevel1() {
-            window.location.href="level1.html";
-        }
-    </script>
+    <script src="script.js"></script>
 </body>
 </html>
