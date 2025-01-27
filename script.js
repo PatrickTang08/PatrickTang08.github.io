@@ -12,11 +12,12 @@ const resetButton = document.getElementById('resetButton');
 let deck = [];
 let playerHand = [];
 let discardPile = [];
-let selectedCard = null;
+let selectedCards = []; // Array to hold selected cards
 let score = 0;
 let discardsLeft = 2;
 let level = 1;
-const MAX_HAND_SIZE = 8; // Limit of cards in the hand
+const MAX_HAND_SIZE = 8;
+const MAX_SELECT_SIZE = 5; // Max cards that can be selected
 
 // Card values and suits (You can add more sophisticated card types)
 const suits = ["H", "D", "C", "S"];
@@ -59,69 +60,78 @@ function drawCard() {
 
 // Function to discard card
 function discardCard() {
-    if (selectedCard === null) {
+    if (selectedCards.length === 0) {
         alert("Select a card to discard")
         return;
     }
-    discardPile.push(selectedCard);
-    playerHand = playerHand.filter(card => card !== selectedCard);
-    selectedCard = null;
+    
+    selectedCards.forEach(card => discardPile.push(card));
+    
+    playerHand = playerHand.filter(card => !selectedCards.includes(card));
+    selectedCards = [];
     discardsLeft--;
 
     renderPlayerHand();
     renderDiscardPile();
     updateGameInfo();
+    selectedCardDiv.innerHTML = `<p>Selected Card</p>`
 }
 
 // Function to calculate hand value
 function calculateHandValue() {
-    let handValue = 0
-    let numPairs = 0;
+  let handValue = 0;
+  let numPairs = 0;
 
-    // Create a mapping to count the occurrences of each value in the hand
-    const valueCounts = {};
-    playerHand.forEach(card => {
-        if (valueCounts[card.value]) {
-            valueCounts[card.value]++;
-        } else {
-            valueCounts[card.value] = 1;
-        }
-    });
+  // Create a mapping to count the occurrences of each value in the selected cards
+  const valueCounts = {};
+  selectedCards.forEach((card) => {
+      if (valueCounts[card.value]) {
+          valueCounts[card.value]++;
+      } else {
+          valueCounts[card.value] = 1;
+      }
+  });
 
-    // Check for pairs
-    for (const value in valueCounts) {
-        if (valueCounts[value] >= 2) {
-            numPairs++;
-        }
-    }
-
-    if (numPairs >= 1) {
-        handValue = 10 * (numPairs * level);
-        if (numPairs >= 2) {
-            handValue += 10 * (numPairs * level)
-        }
-    }
-
+  // Check for pairs
+  for (const value in valueCounts) {
+      if (valueCounts[value] >= 2) {
+          numPairs++;
+      }
+  }
+  
+  if (numPairs >= 1) {
+    handValue = 10 * (numPairs * level);
+      if (numPairs >= 2) {
+          handValue += 10 * (numPairs * level)
+      }
+  }
 
     return handValue;
 }
 
+
 // Function to play the hand
 function playHand() {
+    if (selectedCards.length === 0)
+    {
+      alert("Please select cards to play")
+      return;
+    }
+    
     const handValue = calculateHandValue();
     score += handValue;
     level++;
-    playerHand = [];
+    playerHand = playerHand.filter(card => !selectedCards.includes(card));
     discardsLeft = 2;
     deck = deck.concat(discardPile);
     shuffleDeck(deck);
     discardPile = [];
+    selectedCards = [];
 
     renderPlayerHand();
     renderDiscardPile();
     updateGameInfo();
 }
-
 
 // Function to render the player's hand on the screen
 function renderPlayerHand() {
@@ -154,19 +164,34 @@ function renderDiscardPile() {
 
 // Function to handle selecting a card
 function selectCard(card, cardDiv) {
-    if (selectedCard) {
-        const selectedDiv = document.querySelector('.card.selected');
-        if (selectedDiv) {
-            selectedDiv.classList.remove('selected');
-        }
+    
+    const isSelected = selectedCards.includes(card)
+    if(isSelected){
+        selectedCards = selectedCards.filter(c => c !== card);
+        cardDiv.classList.remove('selected')
     }
-
-    selectedCard = card;
-    cardDiv.classList.add('selected')
-    selectedCardDiv.innerHTML = `<p>Selected Card ${card.value}${card.suit}</p>`
-    discardButton.disabled = false;
-
-    console.log("selected card", card)
+    else
+    {
+        if (selectedCards.length >= MAX_SELECT_SIZE) {
+             alert(`You can only select up to ${MAX_SELECT_SIZE} cards.`);
+             return
+         }
+         selectedCards.push(card);
+          cardDiv.classList.add('selected')
+     }
+    
+     if (selectedCards.length > 0)
+     {
+         discardButton.disabled = false;
+         selectedCardDiv.innerHTML = `<p>Selected Cards ${selectedCards.map(c => c.value+c.suit).join(" ")}</p>`
+     }
+     else
+     {
+         discardButton.disabled = true;
+          selectedCardDiv.innerHTML = `<p>Selected Card</p>`
+     }
+    
+    console.log("selected cards", selectedCards)
 }
 
 // Function to reset the game
@@ -174,7 +199,7 @@ function resetGame() {
     createDeck();
     playerHand = [];
     discardPile = [];
-    selectedCard = null;
+    selectedCards = [];
     score = 0;
     discardsLeft = 2;
     level = 1;
