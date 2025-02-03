@@ -25,11 +25,15 @@ public class GamePanel extends JPanel {
         add(jokerPanel, BorderLayout.NORTH);
 
         // Center panel for player's hand
-        playerHandPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 10));
+        playerHandPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 0, 0)); // No spacing
         playerHandPanel.setBorder(BorderFactory.createTitledBorder("Your Hand"));
+        playerHandPanel.setOpaque(false);
         JScrollPane handScrollPane = new JScrollPane(playerHandPanel);
         handScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_NEVER);
         handScrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        handScrollPane.setPreferredSize(new Dimension(1000, 250)); // Increased size
+        handScrollPane.setOpaque(false);
+        handScrollPane.getViewport().setOpaque(false);
         add(handScrollPane, BorderLayout.CENTER);
 
         // Bottom panel for game info, controls, and deck
@@ -91,28 +95,19 @@ public class GamePanel extends JPanel {
         playerHandPanel.removeAll();
         for (Card card : cards) {
             CardButton cardButton = new CardButton(card);
-            if (selectedCards.contains(card)) {
-                cardButton.setBorder(BorderFactory.createLineBorder(Color.BLUE, 3));
-            } else {
-                cardButton.setBorder(null);
-            }
             cardButton.addActionListener(e -> {
-                if (selectedCards.contains(card)) {
-                    selectedCards.remove(card);
-                    cardButton.setBorder(null);
-                } else {
+                cardButton.setSelected(!cardButton.isSelected());
+                if (cardButton.isSelected()) {
                     selectedCards.add(card);
-                    cardButton.setBorder(BorderFactory.createLineBorder(Color.BLUE, 3));
+                } else {
+                    selectedCards.remove(card);
                 }
-                frame.selectCard(card);
-                cardButton.repaint();
             });
             playerHandPanel.add(cardButton);
         }
         playerHandPanel.revalidate();
         playerHandPanel.repaint();
     }
-
     private void updateDeck(Deck deck) {
         deckPanel.removeAll();
         JButton deckButton = new JButton("Deck: " + deck.getCards().size());

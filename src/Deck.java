@@ -5,22 +5,20 @@ import java.util.Collections;
 import java.util.List;
 
 public class Deck {
-  private List<Card> cards;
+    private List<Card> cards;
 
-      public Deck() {
-          cards = new ArrayList<>();
-          String[] suits = {"H", "C", "D", "S"};
-          String[] values = {"A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K"};
-          int cardWidth = 32;  // Width of each card in the sprite sheet
-          int cardHeight = 48; // Height of each card in the sprite sheet
+    public Deck() {
+        cards = new ArrayList<>();
+        String[] suits = {"H", "C", "D", "S"};
+        String[] values = {"A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K"};
 
-          for (int i = 0; i < suits.length; i++) {
-              for (int j = 0; j < values.length; j++) {
-                  cards.add(new Card(suits[i], values[j], j * cardWidth, i * cardHeight));
-              }
-          }
-          shuffle();
-      }
+        for (int i = 0; i < suits.length; i++) {
+            for (int j = 0; j < values.length; j++) {
+                cards.add(new Card(suits[i], values[j], j, i));
+            }
+        }
+        shuffle();
+    }
 
     public void shuffle() {
         Collections.shuffle(cards);

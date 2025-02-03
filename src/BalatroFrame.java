@@ -14,6 +14,7 @@ public class BalatroFrame extends JFrame {
 
     public BalatroFrame() {
         setTitle("Balatro Simulator");
+        setBackground(new Color(240, 240, 240));  // Light gray background
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setSize(800, 600);
         setLocationRelativeTo(null);
