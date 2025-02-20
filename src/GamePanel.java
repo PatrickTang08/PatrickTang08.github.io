@@ -6,112 +6,104 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class GamePanel extends JPanel {
+    private BalatroFrame frame;
+    private JButton discardButton;
+    private JButton playHandButton;
     private JLabel scoreLabel;
     private JLabel discardsLeftLabel;
     private JLabel levelLabel;
     private JPanel playerHandPanel;
-    private JPanel jokerPanel;
     private JPanel deckPanel;
-    private BalatroFrame frame;
-    private List<Card> selectedCards = new ArrayList<>();
+    private List<Card> selectedCards;
 
     public GamePanel(BalatroFrame frame) {
         this.frame = frame;
+        this.selectedCards = new ArrayList<>();
         setLayout(new BorderLayout());
+        setBackground(new Color(30, 30, 30)); // Dark background
 
-        // Top panel for Jokers (placeholder for now)
-        jokerPanel = new JPanel();
-        jokerPanel.setBorder(BorderFactory.createTitledBorder("Jokers"));
-        add(jokerPanel, BorderLayout.NORTH);
-
-        // Center panel for player's hand
-        playerHandPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 0, 0)); // No spacing
-        playerHandPanel.setBorder(BorderFactory.createTitledBorder("Your Hand"));
-        playerHandPanel.setOpaque(false);
-        JScrollPane handScrollPane = new JScrollPane(playerHandPanel);
-        handScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_NEVER);
-        handScrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-        handScrollPane.setPreferredSize(new Dimension(1000, 250)); // Increased size
-        handScrollPane.setOpaque(false);
-        handScrollPane.getViewport().setOpaque(false);
-        add(handScrollPane, BorderLayout.CENTER);
-
-        // Bottom panel for game info, controls, and deck
-        JPanel bottomPanel = new JPanel(new BorderLayout());
-
-        // Game info panel
-        JPanel infoPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        // Create labels for game info
         scoreLabel = new JLabel("Score: 0");
         discardsLeftLabel = new JLabel("Discards Left: 2");
         levelLabel = new JLabel("Level: 1");
+
+        // Style labels
+        scoreLabel.setForeground(Color.WHITE);
+        discardsLeftLabel.setForeground(Color.WHITE);
+        levelLabel.setForeground(Color.WHITE);
+
+        // Create a panel for game info
+        JPanel infoPanel = new JPanel();
+        infoPanel.setBackground(new Color(30, 30, 30));
         infoPanel.add(scoreLabel);
         infoPanel.add(discardsLeftLabel);
         infoPanel.add(levelLabel);
-        bottomPanel.add(infoPanel, BorderLayout.WEST);
+        add(infoPanel, BorderLayout.NORTH);
 
-        // Control panel
-        JPanel controlPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
-        JButton discardButton = new JButton("Discard");
-        JButton playHandButton = new JButton("Play Hand");
-        JButton resetButton = new JButton("Reset");
+        // Create a panel for the player's hand
+        playerHandPanel = new JPanel();
+        playerHandPanel.setBackground(new Color(30, 30, 30));
+        add(playerHandPanel, BorderLayout.CENTER);
 
-        discardButton.addActionListener(e -> {
-            frame.discardCard();
-            selectedCards.clear();
-        });
+        // Create a panel for the deck
+        deckPanel = new JPanel();
+        deckPanel.setBackground(new Color(30, 30, 30));
+        add(deckPanel, BorderLayout.WEST);
 
-        playHandButton.addActionListener(e -> {
-            frame.playHand();
-            selectedCards.clear();
-        });
+        // Create buttons with custom styling
+        discardButton = new JButton("Discard");
+        playHandButton = new JButton("Play Hand");
 
-        resetButton.addActionListener(e -> {
-            frame.resetGame();
-            selectedCards.clear();
-        });
+        styleButton(discardButton);
+        styleButton(playHandButton);
 
-        controlPanel.add(discardButton);
-        controlPanel.add(playHandButton);
-        controlPanel.add(resetButton);
-        bottomPanel.add(controlPanel, BorderLayout.CENTER);
+        // Add action listeners to buttons
+        discardButton.addActionListener(e -> frame.discardCard());
+        playHandButton.addActionListener(e -> frame.playHand());
 
-        // Deck panel (now in bottom right)
-        deckPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-        deckPanel.setBorder(BorderFactory.createTitledBorder("Deck"));
-        bottomPanel.add(deckPanel, BorderLayout.EAST);
+        // Create a panel for buttons
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.setBackground(new Color(30, 30, 30));
+        buttonPanel.add(discardButton);
+        buttonPanel.add(playHandButton);
+        add(buttonPanel, BorderLayout.SOUTH);
+    }
 
-        add(bottomPanel, BorderLayout.SOUTH);
+    private void styleButton(JButton button) {
+        button.setFont(new Font("Arial", Font.BOLD, 16));
+        button.setBackground(new Color(70, 130, 180)); // Steel blue
+        button.setForeground(Color.WHITE);
+        button.setFocusPainted(false);
+        button.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
+        button.setCursor(new Cursor(Cursor.HAND_CURSOR));
     }
 
     public void updateGame(int level, int score, int discardsLeft, Hand playerHand, Deck deck) {
+        // Update game info labels
         scoreLabel.setText("Score: " + score);
         discardsLeftLabel.setText("Discards Left: " + discardsLeft);
         levelLabel.setText("Level: " + level);
-        updatePlayerHand(playerHand.getCards());
-        updateDeck(deck);
-    }
 
-    private void updatePlayerHand(List<Card> cards) {
+        // Update player's hand
         playerHandPanel.removeAll();
-        for (Card card : cards) {
+        for (Card card : playerHand.getCards()) {
             CardButton cardButton = new CardButton(card);
             cardButton.addActionListener(e -> {
-                cardButton.setSelected(!cardButton.isSelected());
-                if (cardButton.isSelected()) {
-                    selectedCards.add(card);
-                } else {
+                if (selectedCards.contains(card)) {
                     selectedCards.remove(card);
+                } else {
+                    selectedCards.add(card);
                 }
+                frame.selectCard(card);
             });
             playerHandPanel.add(cardButton);
         }
         playerHandPanel.revalidate();
         playerHandPanel.repaint();
-    }
-    private void updateDeck(Deck deck) {
+
+        // Update deck display
         deckPanel.removeAll();
-        JButton deckButton = new JButton("Deck: " + deck.getCards().size());
-        deckButton.setPreferredSize(new Dimension(80, 40));
+        CardButton deckButton = new CardButton(new Card("back", "back")); // Back of the card
         deckPanel.add(deckButton);
         deckPanel.revalidate();
         deckPanel.repaint();

@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class BalatroFrame extends JFrame {
-
     private StartScreen startScreen;
     private GamePanel gamePanel;
     private List<Card> selectedCards;
@@ -14,7 +13,7 @@ public class BalatroFrame extends JFrame {
 
     public BalatroFrame() {
         setTitle("Balatro Simulator");
-        setBackground(new Color(240, 240, 240));  // Light gray background
+        setBackground(new Color(240, 240, 240)); // Light gray background
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setSize(800, 600);
         setLocationRelativeTo(null);
@@ -34,11 +33,11 @@ public class BalatroFrame extends JFrame {
     }
 
     public void showStartScreen() {
-        ((CardLayout)getContentPane().getLayout()).show(getContentPane(), "start");
+        ((CardLayout) getContentPane().getLayout()).show(getContentPane(), "start");
     }
 
     public void showGamePanel() {
-        ((CardLayout)getContentPane().getLayout()).show(getContentPane(), "game");
+        ((CardLayout) getContentPane().getLayout()).show(getContentPane(), "game");
         game.updateGame();
     }
 
