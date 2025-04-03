@@ -15,17 +15,23 @@ public class BalatroGame {
     private BalatroFrame frame;
     private GamePanel gamePanel;
     private List<Card> selectedCards = new ArrayList<>();
+    private int handsRemaining;
+    private int coins;
+    private List<String> jokers;
+    private int[] levelTargets = {50, 100, 150, 200, 250};
 
     public BalatroGame(BalatroFrame frame) {
-        deck = new Deck();
-        playerHand = new Hand();
-        score = 0;
-        discardsLeft = 2;
-        level = 1;
-        this.frame = frame;
-        this.gamePanel = frame.getGamePanel();
-        refillHand();
-    }
+    this.frame = frame;
+    deck = new Deck();
+    playerHand = new Hand();
+    score = 0;
+    discardsLeft = 2;
+    handsRemaining = 3; // Start with 3 hands per level
+    coins = 0;
+    level = 1;
+    this.gamePanel = frame.getGamePanel();
+    refillHand();
+}
 
     public void start() {
         frame.showGamePanel();
@@ -61,22 +67,27 @@ public class BalatroGame {
     }
 
     public void discardCards() {
-        if (selectedCards.isEmpty()) {
-            JOptionPane.showMessageDialog(frame, "Select cards to discard");
-            return;
-        }
-        if (discardsLeft <= 0) {
-            JOptionPane.showMessageDialog(frame, "No discards left");
-            return;
-        }
-        for (Card card : selectedCards) {
-            playerHand.removeCard(card);
-        }
-        discardsLeft--;
-        selectedCards.clear();
-        refillHand();
-        updateGame();
+    if (selectedCards.isEmpty()) {
+        JOptionPane.showMessageDialog(frame, "Select cards to discard");
+        return;
     }
+    if (discardsLeft <= 0) {
+        JOptionPane.showMessageDialog(frame, "No discards left");
+        return;
+    }
+
+    // Remove selected cards
+    for (Card card : selectedCards) {
+        playerHand.removeCard(card);
+    }
+    discardsLeft--;
+    selectedCards.clear(); // Clear selection
+
+    // Update UI
+    frame.getGamePanel().updateSelectionCount(0);
+    refillHand();
+    updateGame();
+}
 
     private void refillHand() {
         while (playerHand.getCardCount() < MAX_HAND_SIZE && !deck.isEmpty()) {
@@ -85,60 +96,101 @@ public class BalatroGame {
     }
 
     public void playHand() {
-         if (selectedCards.isEmpty()) {
-             JOptionPane.showMessageDialog(frame, "Select cards to play");
-             return;
-         }
-         if (selectedCards.size() > MAX_SELECT_SIZE) {
-             JOptionPane.showMessageDialog(frame, "You can only play up to 5 cards at a time");
-             return;
-         }
-         int handValue = calculateHandValue(selectedCards);
-         score += handValue;
-         level++;
-         for (Card card : selectedCards) {
-             playerHand.removeCard(card);
-         }
-         selectedCards.clear();
-         discardsLeft = 2;
-         refillHand();
-         updateGame();
-         JOptionPane.showMessageDialog(frame, "Hand Played! Hand value: " + handValue);
-     }
-
-    private int calculateHandValue(List<Card> cards) {
-        int handValue = 0;
-        int pairs = 0;
-        int threeOfAKinds = 0;
-        int fourOfAKinds = 0;
-
-        java.util.Map<String, Integer> valueCounts = new java.util.HashMap<>();
-        for (Card card : cards) {
-            valueCounts.put(card.getValue(), valueCounts.getOrDefault(card.getValue(), 0) + 1);
+        if (selectedCards.isEmpty()) {
+            JOptionPane.showMessageDialog(frame, "Select cards to play");
+            return;
         }
-        for (int count : valueCounts.values()) {
-            if (count == 2) {
-                pairs++;
-            } else if (count == 3) {
-                threeOfAKinds++;
-            } else if (count == 4) {
-                fourOfAKinds++;
+        if (!isValidHand(selectedCards)) {
+            JOptionPane.showMessageDialog(frame, "Invalid hand combination");
+            return;
+        }
+
+        String handType = determineHandType(selectedCards);
+        int handValue = calculateHandValue(selectedCards);
+        score += handValue;
+
+        // Remove played cards
+        for (Card card : selectedCards) {
+            playerHand.removeCard(card);
+        }
+        selectedCards.clear();
+
+        // Update UI
+        frame.getGamePanel().updateSelectionCount(0);
+        refillHand();
+        updateGame();
+
+        JOptionPane.showMessageDialog(frame,
+            "Played " + handType + "! Value: " + handValue +
+            "\nTotal Score: " + score + "/" + getCurrentTarget());
+
+        // End level immediately if target is reached
+        if (score >= getCurrentTarget()) {
+            endLevel();
+        }
+        // Otherwise decrement hands remaining
+        else {
+            handsRemaining--;
+            if (handsRemaining <= 0) {
+                endLevel();
             }
         }
+    }
+    private boolean isValidHand(List<Card> cards) {
+        return Hand.isPair(cards) || Hand.isThreeOfAKind(cards) ||
+               Hand.isFourOfAKind(cards) || Hand.isFlush(cards) ||
+               Hand.isStraight(cards) || Hand.isFullHouse(cards) ||
+               Hand.isTwoPair(cards) || cards.size() == 1;
+    }
+    private void endLevel() {
+        boolean levelPassed = score >= getCurrentTarget();
+        // Calculate coins: 1 base + 1 per discard left + 2 per hand left (if level passed)
+        int coinsEarned = 1 + discardsLeft + (levelPassed ? handsRemaining * 2 : 0);
+        coins += coinsEarned;
 
-        if (fourOfAKinds > 0) {
-            handValue = 100 * fourOfAKinds * level;
-        } else if (threeOfAKinds > 0) {
-            handValue = 50 * threeOfAKinds * level;
-        } else if (pairs > 0) {
-            handValue = 10 * pairs * level;
+        frame.showShopScreen(coins, coinsEarned);
+    }
+    private String determineHandType(List<Card> cards) {
+        return Hand.determineHandType(cards);
+    }
+
+    private int calculateHandValue(List<Card> cards) {
+        String handType = determineHandType(cards);
+        int multiplier = 1;
+
+        switch (handType) {
+            case "Four of a Kind":
+                multiplier = 100;
+                break;
+            case "Full House":
+                multiplier = 80;
+                break;
+            case "Flush":
+                multiplier = 60;
+                break;
+            case "Straight":
+                multiplier = 50;
+                break;
+            case "Three of a Kind":
+                multiplier = 30;
+                break;
+            case "Two Pair":
+                multiplier = 20;
+                break;
+            case "Pair":
+                multiplier = 10;
+                break;
+            default: // High Card or single card
+                multiplier = 1;
         }
-        return handValue;
-    }
 
-    public void updateGame() {
-        gamePanel.updateGame(level, score, discardsLeft, playerHand, deck);
+        return multiplier * level;
     }
+    public void updateGame() {
+    if (frame.getGamePanel() != null) {
+        frame.getGamePanel().updateGame(level, score, discardsLeft, playerHand, deck);
+    }
+}
 
     public Deck getDeck() {
         return deck;
@@ -159,4 +211,36 @@ public class BalatroGame {
     public Hand getPlayerHand() {
         return playerHand;
     }
+    public void addJoker(String joker) {
+        jokers.add(joker);
+    }
+
+    public void deductCoins(int amount) {
+        coins -= amount;
+    }
+
+    public int getCoins() {
+        return coins;
+    }
+
+    public void startNextLevel() {
+    if (score >= getCurrentTarget()) {
+        level++;
+        score = 0; // Reset score for new level
+    }
+    handsRemaining = 3 + level;
+    discardsLeft = 2 + level;
+    selectedCards.clear();
+    deck = new Deck();
+    playerHand = new Hand();
+    refillHand();
+}
+    public int getHandsRemaining() {
+    return handsRemaining;
+}
+public int getCurrentTarget() {
+    return levelTargets[Math.min(level-1, levelTargets.length-1)];
+}
+
+
 }
